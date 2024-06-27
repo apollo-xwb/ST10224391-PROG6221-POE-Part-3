@@ -48,11 +48,11 @@ The Recipe App aids users in:
 
 1. **Clone the repository:**
     ```bash
-    git clone https://github.com/apollo-xwb/ST10224391-PROG6221-POE-Part-2
+    git clone https://github.com/apollo-xwb/ST10224391-PROG6221-POE-Part-3
     ```
 2. **Go to the projects directory:**
     ```bash
-    cd ST10224391-PROG6221-POE-Part-2
+    cd ST10224391-PROG6221-POE-Part-3
     ```
 3. **Open the solution in Visual Studio:**
     - Double-click the `ST10224391 PROG6221 POE Part 3.sln` file in order to open it in Visual Studio.
