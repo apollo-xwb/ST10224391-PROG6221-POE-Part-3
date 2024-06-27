@@ -6,11 +6,11 @@ namespace ST10224391_PROG6221_POE_Part_3
 {
     public class Recipe
     {
-        public string Name { get; private set; }
-        public List<Ingredient> Ingredients { get; private set; }
-        public List<string> Steps { get; private set; }
-        public int CaloriesPerServing { get; private set; }
-        public string FoodGroup { get; private set; }
+        public string Name { get; set; }
+        public List<Ingredient> Ingredients { get; set; }
+        public List<string> Steps { get; set; }
+        public int CaloriesPerServing { get; set; }
+        public string FoodGroup { get; set; }
         public double ScaleFactor { get; private set; }
         public double TotalCalories
         {
@@ -53,14 +53,14 @@ namespace ST10224391_PROG6221_POE_Part_3
             if (scaleFactor <= 0)
                 throw new ArgumentException("Scale factor must be greater than 0.");
 
-            Recipe scaledRecipe = new Recipe(this.Name + " (Scaled)", this.FoodGroup); // Keep the same food group
+            Recipe scaledRecipe = new Recipe(this.Name + " (Scaled)", this.FoodGroup); // Keep the food group the same
             foreach (var ingredient in Ingredients)
             {
-                Ingredient scaledIngredient = new Ingredient(ingredient.Name, ingredient.Quantity * scaleFactor, ingredient.Unit, ingredient.Calories, ingredient.FoodGroup);
+                Ingredient scaledIngredient = new Ingredient(ingredient.Name, ingredient.Quantity * scaleFactor, ingredient.Unit, ingredient.Calories * scaleFactor, ingredient.FoodGroup);
                 scaledRecipe.AddIngredient(scaledIngredient);
             }
             scaledRecipe.AddSteps(this.Steps); // Copy steps
-            scaledRecipe.CaloriesPerServing = (int)(this.CaloriesPerServing * scaleFactor); // Convert to int for CaloriesPerServing
+            scaledRecipe.CaloriesPerServing = (int)(this.CaloriesPerServing * scaleFactor); // Scale calories per serving
             return scaledRecipe;
         }
 
@@ -71,11 +71,6 @@ namespace ST10224391_PROG6221_POE_Part_3
             {
                 CaloriesExceeded?.Invoke(Name, totalCalories);
             }
-        }
-
-        public override string ToString()
-        {
-            return Name;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace ST10224391_PROG6221_POE_Part_3
             currentSteps = new ObservableCollection<string>();
             IngredientsListBox.ItemsSource = currentIngredients;
             StepsListBox.ItemsSource = currentSteps;
-            RecipeListBox.ItemsSource = recipeManager.Recipes;
+            RecipeListBox.ItemsSource = recipeManager.Recipes.Select(r => r.Name); // Bind only recipe names
         }
 
         private void AddIngredient_Click(object sender, RoutedEventArgs e)
@@ -33,6 +33,13 @@ namespace ST10224391_PROG6221_POE_Part_3
                 string foodGroup = FoodGroupTextBox.Text;
                 Ingredient ingredient = new Ingredient(name, quantity, unit, calories, foodGroup);
                 currentIngredients.Add(ingredient);
+
+                // Check total calories after adding the ingredient
+                double totalCalories = currentIngredients.Sum(i => i.Calories);
+                if (totalCalories > 300)
+                {
+                    MessageBox.Show($"Warning: Calories for '{name}' exceed 300 (Total: {totalCalories}).");
+                }
 
                 // Clear input fields after adding ingredient
                 IngredientNameTextBox.Clear();
@@ -87,6 +94,9 @@ namespace ST10224391_PROG6221_POE_Part_3
             RecipeNameTextBox.Clear();
             currentIngredients.Clear();
             currentSteps.Clear();
+
+            // Update RecipeListBox to display recipe names
+            RecipeListBox.ItemsSource = recipeManager.Recipes.Select(r => r.Name);
         }
 
         private void ClearSteps_Click(object sender, RoutedEventArgs e)
@@ -96,40 +106,45 @@ namespace ST10224391_PROG6221_POE_Part_3
 
         private void RecipeListBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
-            if (RecipeListBox.SelectedItem is Recipe selectedRecipe)
+            if (RecipeListBox.SelectedItem is string recipeName) // Handle selection of recipe name
             {
-                DisplayRecipeDetails(selectedRecipe);
+                var recipe = recipeManager.GetRecipe(recipeName);
+                DisplayRecipeDetails(recipe);
             }
         }
 
         private void DisplayRecipeDetails(Recipe recipe)
         {
-            StringBuilder details = new StringBuilder();
-            details.AppendLine($"Recipe Name: {recipe.Name}");
-            details.AppendLine("Ingredients:");
-            foreach (var ingredient in recipe.Ingredients)
+            if (recipe != null)
             {
-                details.AppendLine($"{ingredient.Quantity} {ingredient.Unit} of {ingredient.Name} - {ingredient.Calories} calories ({ingredient.FoodGroup})");
+                StringBuilder details = new StringBuilder();
+                details.AppendLine($"Recipe Name: {recipe.Name}");
+                details.AppendLine("Ingredients:");
+                foreach (var ingredient in recipe.Ingredients)
+                {
+                    details.AppendLine($"{ingredient.Quantity} {ingredient.Unit} of {ingredient.Name} - {ingredient.Calories} calories ({ingredient.FoodGroup})");
+                }
+                details.AppendLine("Steps:");
+                foreach (var step in recipe.Steps)
+                {
+                    details.AppendLine(step);
+                }
+                RecipeDetailsTextBlock.Text = details.ToString();
             }
-            details.AppendLine("Steps:");
-            foreach (var step in recipe.Steps)
-            {
-                details.AppendLine(step);
-            }
-            RecipeDetailsTextBlock.Text = details.ToString();
         }
 
         private void ScaleRecipe_Click(object sender, RoutedEventArgs e)
         {
-            if (RecipeListBox.SelectedItem is Recipe selectedRecipe)
+            if (RecipeListBox.SelectedItem is string recipeName) // Handle selection of recipe name
             {
                 if (double.TryParse(ScaleFactorTextBox.Text, out double scaleFactor))
                 {
                     try
                     {
+                        Recipe selectedRecipe = recipeManager.GetRecipe(recipeName);
                         Recipe scaledRecipe = selectedRecipe.ScaleRecipe(scaleFactor);
                         recipeManager.AddRecipe(scaledRecipe); // Add scaled recipe to manager
-                        RecipeListBox.SelectedItem = scaledRecipe; // Select the scaled recipe in the list
+                        RecipeListBox.SelectedItem = scaledRecipe.Name; // Select the scaled recipe name in the list
                         DisplayRecipeDetails(scaledRecipe); // Display scaled recipe details
                         MessageBox.Show("Recipe scaled successfully.");
                     }
